@@ -19,4 +19,8 @@ export default class PointListView extends AbstractView {
     render(component, li);
     this.element.append(li);
   }
+
+  replaceComponent(component1, component2) {
+    this.element.replaceChild(component1.element, component2.element);
+  }
 }

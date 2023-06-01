@@ -2,7 +2,7 @@ import AbstractView from './abstract-view.js';
 import { POINT_TYPES } from '../const.js';
 import { destinationsStorage, offersStorage } from '../mock/point.js';
 
-const createPointListEditFormTemplate = (point) => {
+const createPointListFormTemplate = (point) => {
   const pointDestination = destinationsStorage[point.destination];
   const pointTypeIconMarkup = `img/icons/${point.type}.png`;
   const pointPriceMarkup = point.base_price ? point.base_price : '';
@@ -117,7 +117,7 @@ const createPointListEditFormTemplate = (point) => {
   </form>`;
 };
 
-export default class PointListEditFormView extends AbstractView {
+export default class PointListFormView extends AbstractView {
   #element = null;
 
   constructor(point) {
@@ -126,6 +126,6 @@ export default class PointListEditFormView extends AbstractView {
   }
 
   get template() {
-    return createPointListEditFormTemplate(this.#element);
+    return createPointListFormTemplate(this.#element);
   }
 }
