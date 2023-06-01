@@ -118,12 +118,14 @@ const createPointListEditFormTemplate = (point) => {
 };
 
 export default class PointListEditFormView extends AbstractView {
+  #element = null;
+
   constructor(point) {
     super();
-    this.point = point;
+    this.#element = point;
   }
 
-  getTemplate() {
-    return createPointListEditFormTemplate(this.point);
+  get template() {
+    return createPointListEditFormTemplate(this.#element);
   }
 }
