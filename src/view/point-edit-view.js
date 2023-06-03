@@ -4,7 +4,7 @@ import { destinationsStorage, offersStorage } from '../mock/point.js';
 
 const pointPriceMarkup = (point) => point.base_price ? point.base_price : '';
 
-const createPointListFormTemplate = (point) => {
+const createPointEditTemplate = (point) => {
   const pointDestination = destinationsStorage[point.destination];
   const pointTypeIconMarkup = `img/icons/${point.type}.png`;
   const getPointTypesMarkup = () => POINT_TYPES.map((pointType) => `
@@ -118,7 +118,7 @@ const createPointListFormTemplate = (point) => {
   </form>`;
 };
 
-export default class PointListFormView extends AbstractView {
+export default class PointEditView extends AbstractView {
   #point = null;
 
   constructor(point) {
@@ -127,7 +127,7 @@ export default class PointListFormView extends AbstractView {
   }
 
   get template() {
-    return createPointListFormTemplate(this.#point);
+    return createPointEditTemplate(this.#point);
   }
 
   setFormSubmitHandler = (callback) => {
