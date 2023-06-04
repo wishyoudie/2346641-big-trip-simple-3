@@ -68,12 +68,12 @@ const createPointPriceTemplate = (id, price) => (`
   </div>
 `);
 
-const mapOffers = (checkedOffers) => {
+const mapOffers = (stateOffers) => {
   const markup = [];
-  for (const offer of Object.values(offersStorage)) {
+  for (const offer of stateOffers) {
     markup.push(`
       <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" type="checkbox" name="event-offer-${offer.id}" ${checkedOffers.includes(offer.id) ? 'checked' : ''}>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" type="checkbox" name="event-offer-${offer.id}" ${offer.isChecked ? 'checked' : ''}>
         <label class="event__offer-label" for="event-offer-${offer.id}">
           <span class="event__offer-title">${offer.title}</span>
           &plus;&euro;&nbsp;
@@ -85,12 +85,12 @@ const mapOffers = (checkedOffers) => {
   return markup.join('');
 };
 
-const createPointOffersTemplate = (checkedOffers) => (`
+const createPointOffersTemplate = (stateOffers) => (`
   <section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
     <div class="event__available-offers">
-      ${mapOffers(checkedOffers)}
+      ${mapOffers(stateOffers)}
     </div>
   </section>
 `);
@@ -118,7 +118,7 @@ const createPointEditTemplate = (data) => {
   const pointDestinationTemplate = createPointDestinationTemplate(data.id, data.type, dataDestination);
   const pointTimeTemplate = createPointTimeTemplate(data.id, data.date_from, data.date_to);
   const pointPriceTemplate = createPointPriceTemplate(data.id, data.base_price);
-  const pointOffersTemplate = createPointOffersTemplate(data.offers);
+  const pointOffersTemplate = createPointOffersTemplate(data.state_offers);
   const pointDestDetailsTemplate = createPointDestDetailsTemplate(dataDestination);
 
   return `
@@ -178,6 +178,26 @@ export default class PointEditView extends AbstractStatefulView {
     this._callback.formReset();
   };
 
-  static parsePointToState = (point) => ({...point});
-  static parseStateToPoint = (state) => ({...state});
+  static parsePointToState = (point) => {
+    const offs = [];
+    for (const off of Object.values(offersStorage)) {
+      offs.push({...off, 'isChecked': point.offers.includes(off.id)});
+    }
+    return {...point, 'state_offers': offs};
+  };
+
+  static parseStateToPoint = (state) => {
+    // stOff: {id, title, price, isChecked}
+    // stOffs = [{}, {}, ...]
+    const point = {...state};
+    const noffers = [];
+    point.state_offers.map((stoff) => {
+      if (stoff.isChecked) {
+        noffers.push(stoff.id);
+      }
+    });
+    point.offers = noffers;
+    delete point.state_offers;
+    return point;
+  };
 }
