@@ -11,17 +11,17 @@ const createPointIconTemplate = (id, type) => (`
     <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${id}" type="checkbox">`
 );
 
-const mapPointTypes = () => POINT_TYPES.map((pointType) => `
+const mapPointTypes = (id) => POINT_TYPES.map((pointType) => `
   <div class="event__type-item">
-    <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${pointType}">
-    <label class="event__type-label  event__type-label--${pointType}" for="event-type-${pointType}-1">${pointType.charAt(0).toUpperCase()}${pointType.slice(1)}</label>
+    <input id="event-type-taxi-${id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${pointType}">
+    <label class="event__type-label  event__type-label--${pointType}" for="event-type-${pointType}-${id}">${pointType.charAt(0).toUpperCase()}${pointType.slice(1)}</label>
   </div>`).join('');
 
-const createPointTypeListTemplate = () => (`
+const createPointTypeListTemplate = (id) => (`
   <div class="event__type-list">
   <fieldset class="event__type-group">
     <legend class="visually-hidden">Event type</legend>
-    ${mapPointTypes()}
+    ${mapPointTypes(id)}
   </fieldset>
   </div>
 `);
@@ -114,7 +114,7 @@ const createPointDestDetailsTemplate = (destination) => (`
 const createPointEditTemplate = (data) => {
   const dataDestination = destinationsStorage[data.destination];
   const pointIconTemplate = createPointIconTemplate(data.id, data.type);
-  const pointTypeListTemplate = createPointTypeListTemplate();
+  const pointTypeListTemplate = createPointTypeListTemplate(data.id);
   const pointDestinationTemplate = createPointDestinationTemplate(data.id, data.type, dataDestination);
   const pointTimeTemplate = createPointTimeTemplate(data.id, data.date_from, data.date_to);
   const pointPriceTemplate = createPointPriceTemplate(data.id, data.base_price);
