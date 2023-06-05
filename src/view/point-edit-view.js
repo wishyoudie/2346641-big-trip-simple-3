@@ -12,12 +12,12 @@ import { compareDates,
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
-const createPointIconTemplate = (id, type) => (`
+const createPointIconTemplate = (id, type, isDisabled) => (`
     <label class="event__type  event__type-btn" for="event-type-toggle-${id}">
       <span class="visually-hidden">Choose event type</span>
       <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
     </label>
-    <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${id}" type="checkbox">`
+    <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${id}" type="checkbox" ${isDisabled ? 'disabled' : ''}>`
 );
 
 const mapPointTypes = (id) => POINT_TYPES.map((pointType) => `
@@ -40,44 +40,80 @@ const createDestinationListTemplate = (availableDestinations) =>
     .map((destination) => (`<option value="${destination.name}"></option>`))
     .join('');
 
-const createPointDestinationTemplate = (id, type, destination, availableDestinations) => (`
+const createPointDestinationTemplate = (id, type, destination, availableDestinations, isDisabled) => (`
   <div class="event__field-group  event__field-group--destination">
     <label class="event__label  event__type-output" for="event-destination-${id}">
       ${type}
     </label>
-    <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${destination.name}" list="destination-list-${id}">
+    <input
+    class="event__input  event__input--destination"
+    id="event-destination-${id}"
+    type="text"
+    name="event-destination"
+    value="${destination.name}"
+    list="destination-list-${id}"
+    ${isDisabled ? 'disabled' : ''}>
     <datalist id="destination-list-${id}">
       ${createDestinationListTemplate(availableDestinations)}
     </datalist>
   </div>
 `);
 
-const createPointTimeTemplate = (id, dateFrom, dateTo) => (`
+const createPointTimeTemplate = (id, dateFrom, dateTo, isDisabled) => (`
   <div class="event__field-group  event__field-group--time">
     <label class="visually-hidden" for="event-start-time-${id}}">From</label>
-    <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${getFormattedDate(dateFrom, 'DD/MM/YY HH:mm')}">
+
+    <input
+    class="event__input  event__input--time"
+    id="event-start-time-${id}"
+    type="text"
+    name="event-start-time"
+    value="${getFormattedDate(dateFrom, 'DD/MM/YY HH:mm')}"
+    ${isDisabled ? 'disabled' : ''}>
+
     &mdash;
+
     <label class="visually-hidden" for="event-end-time-${id}">To</label>
-    <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="${getFormattedDate(dateTo, 'DD/MM/YY HH:mm')}">
+
+    <input
+    class="event__input  event__input--time"
+    id="event-end-time-${id}"
+    type="text"
+    name="event-end-time"
+    value="${getFormattedDate(dateTo, 'DD/MM/YY HH:mm')}"
+    ${isDisabled ? 'disabled' : ''}>
+
   </div>
 `);
 
-const createPointPriceTemplate = (id, price) => (`
+const createPointPriceTemplate = (id, price, isDisabled) => (`
   <div class="event__field-group  event__field-group--price">
     <label class="event__label" for="event-price-${id}">
       <span class="visually-hidden">Price</span>
       &euro;
     </label>
-    <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${validateNumber(price)}">
+
+    <input
+    class="event__input  event__input--price"
+    id="event-price-${id}"
+    type="text"
+    name="event-price"
+    value="${validateNumber(price)}"
+    ${isDisabled ? 'disabled' : ''}>
   </div>
 `);
 
-const mapOffers = (stateOffers) => {
+const mapOffers = (stateOffers, isDisabled) => {
   const markup = [];
   for (const offer of stateOffers) {
     markup.push(`
       <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" type="checkbox" name="event-offer-${offer.id}" ${offer.isChecked ? 'checked' : ''}>
+        <input class="event__offer-checkbox  visually-hidden"
+        id="event-offer-${offer.id}"
+        type="checkbox"
+        name="event-offer-${offer.id}"
+        ${offer.isChecked ? 'checked' : ''}
+        ${isDisabled ? 'disabled' : ''}>
         <label class="event__offer-label" for="event-offer-${offer.id}">
           <span class="event__offer-title">${offer.title}</span>
           &plus;&euro;&nbsp;
@@ -89,7 +125,7 @@ const mapOffers = (stateOffers) => {
   return markup.join('');
 };
 
-const createPointOffersTemplate = (stateOffers) => {
+const createPointOffersTemplate = (stateOffers, isDisabled) => {
   if (stateOffers.length === 0) {
     return '';
   }
@@ -98,7 +134,7 @@ const createPointOffersTemplate = (stateOffers) => {
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
       <div class="event__available-offers">
-        ${mapOffers(stateOffers)}
+        ${mapOffers(stateOffers, isDisabled)}
       </div>
     </section>`;
 };
@@ -120,13 +156,14 @@ const createPointDestDetailsTemplate = (destination) => (`
 `);
 
 const createPointEditTemplate = (data, availableDestinations) => {
+  const {isDisabled, isSaving, isDeleting} = data;
   const dataDestination = availableDestinations[data.destination - 1];
-  const pointIconTemplate = createPointIconTemplate(data.id, data.type);
+  const pointIconTemplate = createPointIconTemplate(data.id, data.type, isDisabled);
   const pointTypeListTemplate = createPointTypeListTemplate(data.id);
-  const pointDestinationTemplate = createPointDestinationTemplate(data.id, data.type, dataDestination, availableDestinations);
-  const pointTimeTemplate = createPointTimeTemplate(data.id, data.date_from, data.date_to);
-  const pointPriceTemplate = createPointPriceTemplate(data.id, data.base_price);
-  const pointOffersTemplate = createPointOffersTemplate(data.state_offers);
+  const pointDestinationTemplate = createPointDestinationTemplate(data.id, data.type, dataDestination, availableDestinations, isDisabled);
+  const pointTimeTemplate = createPointTimeTemplate(data.id, data.date_from, data.date_to, isDisabled);
+  const pointPriceTemplate = createPointPriceTemplate(data.id, data.base_price, isDisabled);
+  const pointOffersTemplate = createPointOffersTemplate(data.state_offers, isDisabled);
   const pointDestDetailsTemplate = createPointDestDetailsTemplate(dataDestination);
 
   return `
@@ -141,8 +178,8 @@ const createPointEditTemplate = (data, availableDestinations) => {
     ${pointTimeTemplate}
     ${pointPriceTemplate}
 
-    <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-    <button class="event__reset-btn" type="reset">Delete</button>
+    <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
+    <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${isDeleting ? 'Deleting...' : 'Delete'}</button>
     <button class="event__rollup-btn" type="button">
       <span class="visually-hidden">Open event</span>
     </button>
@@ -329,7 +366,13 @@ export default class PointEditView extends AbstractStatefulView {
     for (const off of availableOffers) {
       offs.push({...off, 'isChecked': point.offers.includes(off.id)});
     }
-    return {...point, 'state_offers': offs};
+    return {
+      ...point,
+      'state_offers': offs,
+      'isDisabled': false,
+      'isSaving': false,
+      'isDeleting': false,
+    };
   };
 
   static parseStateToPoint = (state) => {
@@ -337,6 +380,9 @@ export default class PointEditView extends AbstractStatefulView {
     const noffers = point.state_offers.filter((stoff) => stoff.isChecked);
     point.offers = noffers;
     delete point.state_offers;
+    delete point.isDisabled;
+    delete point.isSaving;
+    delete point.isDeleting;
     return point;
   };
 }
