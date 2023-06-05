@@ -1,8 +1,7 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { POINT_TYPES } from '../const.js';
-import { destinationsStorage, offersStorage } from '../mock/point.js';
-import { compareDates, getFormattedDate, getIdFromTag, turnModelDateToFramework } from '../utils/util.js';
-
+import { destinationsStorage, getDefaultPoint, offersStorage } from '../mock/point.js';
+import { compareDates, getFormattedDate, getIdFromTag, turnModelDateToFramework, validateNumber } from '../utils/util.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -59,7 +58,7 @@ const createPointPriceTemplate = (id, price) => (`
       <span class="visually-hidden">Price</span>
       &euro;
     </label>
-    <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${price}">
+    <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${validateNumber(price)}">
   </div>
 `);
 
@@ -145,7 +144,7 @@ export default class PointEditView extends AbstractStatefulView {
   #datepickers = [];
   _state = null;
 
-  constructor(point) {
+  constructor(point = getDefaultPoint()) {
     super();
     this._state = PointEditView.parsePointToState(point);
 

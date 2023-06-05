@@ -6,7 +6,14 @@ export const getFormattedDate = (eventDate, format = MODEL_DATE_FORMAT) => dayjs
 export const turnModelDateToFramework = (date) => dayjs(date).format('DD/MM/YY HH:mm');
 export const isEventUpcoming = (date) => !dayjs(date).isBefore(dayjs(), 'day');
 export const compareDates = (a, b) => dayjs(a).diff(dayjs(b)) < 0;
-
+export const validateNumber = (num) => {
+  if (isNaN(num)) {
+    return 0;
+  } else if (num >= 0) {
+    return num;
+  }
+  return -num;
+};
 export const getMockText = (len) => {
   const mockText = `
   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
