@@ -1,7 +1,14 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { POINT_TYPES } from '../const.js';
-import { compareDates, getFormattedDate, getIdFromTag, turnModelDateToFramework, validateNumber } from '../utils/util.js';
-import PointsModel from '../model/point-model.js';
+import { compareDates,
+  getFormattedDate,
+  getIdFromTag,
+  turnModelDateToFramework,
+  validateNumber,
+  getListElementId,
+  getListElementsNamesList,
+  getAvailableOffers
+} from '../utils/util.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -82,15 +89,19 @@ const mapOffers = (stateOffers) => {
   return markup.join('');
 };
 
-const createPointOffersTemplate = (stateOffers) => (`
-  <section class="event__section  event__section--offers">
-    <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+const createPointOffersTemplate = (stateOffers) => {
+  if (stateOffers.length === 0) {
+    return '';
+  }
+  return `
+    <section class="event__section  event__section--offers">
+      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
-    <div class="event__available-offers">
-      ${mapOffers(stateOffers)}
-    </div>
-  </section>
-`);
+      <div class="event__available-offers">
+        ${mapOffers(stateOffers)}
+      </div>
+    </section>`;
+};
 
 const getDestinationPicturesMarkup = (destination) => destination.pictures.map((pic) => `
   <img class="event__photo" src="${pic.src}" alt="${pic.description}">
@@ -143,15 +154,25 @@ const createPointEditTemplate = (data, availableDestinations) => {
   </form>`;
 };
 
+const defaultPoint = {
+  'id': 0,
+  'type': 'taxi',
+  'base_price': 0,
+  'date_from': '1970-01-01',
+  'date_to': '1970-01-02',
+  'destination': null,
+  'offers': [],
+};
+
 export default class PointEditView extends AbstractStatefulView {
   #datepickers = [];
   _state = null;
   #availableOffers = [];
   #availableDestinations = [];
 
-  constructor(point = PointsModel.defaultPoint(), availableOffers = [], availableDestinations = []) {
+  constructor(point = defaultPoint, availableOffers = [], availableDestinations = []) {
     super();
-    this._state = PointEditView.parsePointToState(point, availableOffers);
+    this._state = PointEditView.parsePointToState(point, getAvailableOffers(point.type, availableOffers));
     this.#availableOffers = availableOffers;
     this.#availableDestinations = availableDestinations;
 
@@ -173,13 +194,14 @@ export default class PointEditView extends AbstractStatefulView {
   };
 
   reset = (point, availableOffers) => {
-    this.updateElement(PointEditView.parsePointToState(point, availableOffers));
+    this.updateElement(PointEditView.parsePointToState(point, getAvailableOffers(point.type, availableOffers)));
   };
 
   _restoreHandlers = () => {
     this.#setInnerHandlers();
     this.#setDatepickers();
     this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setFormResetHandler(this._callback.formReset);
     this.setDeleteClickHandler(this._callback.deleteClick);
   };
 
@@ -261,18 +283,18 @@ export default class PointEditView extends AbstractStatefulView {
 
   #typeHandler = (evt) => {
     evt.preventDefault();
+    const ntype = evt.target.textContent.toLowerCase();
     this.updateElement({
-      'type': evt.target.textContent.toLowerCase(),
+      'type': ntype,
+      'state_offers': getAvailableOffers(ntype, this.#availableOffers),
     });
   };
-
-  static getDestinationId = (destinationName, availableDestinations) => availableDestinations.map((current) => current.name).indexOf(destinationName) + 1;
 
   #destinationHandler = (evt) => {
     evt.preventDefault();
     const destination = evt.target.value;
-    const index = PointEditView.getDestinationId(destination, this.#availableDestinations);
-    if (index !== -1) {
+    if (getListElementsNamesList(this.#availableDestinations).includes(destination)) {
+      const index = getListElementId(destination, this.#availableDestinations);
       this.updateElement({
         'destination': index,
       });

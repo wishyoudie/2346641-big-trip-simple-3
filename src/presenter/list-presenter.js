@@ -8,7 +8,6 @@ import { sortPointsByDay, sortPointsByPrice } from '../utils/sort.js';
 import { filter } from '../utils/filter.js';
 import NewPointPresenter from './new-point-presenter.js';
 import LoadingView from '../view/loading-view.js';
-import {getAvailableOffers} from '../utils/util.js';
 
 export default class ListPresenter {
   #container = null;
@@ -151,9 +150,7 @@ export default class ListPresenter {
 
   #renderListItemComponent = (point) => {
     const pointPresenter = new PointPresenter(this.#pointListComponent, this.#handleViewAction, this.#handleModeChange);
-    pointPresenter.init(point,
-      getAvailableOffers(point.type, this.#pointsModel.offers),
-      this.#pointsModel.destinations);
+    pointPresenter.init(point, this.#pointsModel.offers, this.#pointsModel.destinations);
     this.#pointPresenter.set(point.id, pointPresenter);
   };
 
