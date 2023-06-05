@@ -20,7 +20,6 @@ export default class PointPresenter {
   #point = null;
   #mode = Mode.DEFAULT;
   #availableOffers = [];
-  #availableDestinations = []; // but point only has one destination...... but you can change it......................
 
   constructor(pointListContainer, changeData, changeMode) {
     this.#pointListContainer = pointListContainer;
@@ -31,7 +30,6 @@ export default class PointPresenter {
   init(point, availableOffers, availableDestinations) {
     this.#point = point;
     this.#availableOffers = availableOffers;
-    this.#availableDestinations = availableDestinations;
 
     const prevPointComponent = this.#pointComponent;
     const prevPointEditComponent = this.#pointEditComponent;
@@ -88,18 +86,6 @@ export default class PointPresenter {
     }
   };
 
-  resetView = () => {
-    if (this.#mode !== Mode.DEFAULT) {
-      this.#pointEditComponent.reset(this.#point, this.#availableOffers);
-      this.#replaceFormToPoint();
-    }
-  };
-
-  destroy = () => {
-    remove(this.#pointComponent);
-    remove(this.#pointEditComponent);
-  };
-
   setAborting = () => {
     if (this.#mode === Mode.DEFAULT) {
       this.#pointComponent.shake();
@@ -115,6 +101,18 @@ export default class PointPresenter {
     };
 
     this.#pointEditComponent.shake(resetFormState);
+  };
+
+  resetView = () => {
+    if (this.#mode !== Mode.DEFAULT) {
+      this.#pointEditComponent.reset(this.#point, this.#availableOffers);
+      this.#replaceFormToPoint();
+    }
+  };
+
+  destroy = () => {
+    remove(this.#pointComponent);
+    remove(this.#pointEditComponent);
   };
 
   #replacePointToForm = () => {
@@ -143,7 +141,7 @@ export default class PointPresenter {
   };
 
   #handleFormSubmit = (update) => {
-    const isMinorUpdate = compareDates(update.date_from); // possible filter problems later
+    const isMinorUpdate = compareDates(update.date_from);
     this.#changeData(
       UserAction.UPDATE_POINT,
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,

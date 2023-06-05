@@ -1,3 +1,5 @@
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { POINT_TYPES, defaultPoint } from '../const.js';
 import { compareDates,
@@ -9,8 +11,6 @@ import { compareDates,
   getListElementsNamesList,
   getAvailableOffers
 } from '../utils/util.js';
-import flatpickr from 'flatpickr';
-import 'flatpickr/dist/flatpickr.min.css';
 
 const createPointIconTemplate = (id, type, isDisabled) => (`
     <label class="event__type  event__type-btn" for="event-type-toggle-${id}">
@@ -192,8 +192,9 @@ const createPointEditTemplate = (data, availableDestinations) => {
 };
 
 export default class PointEditView extends AbstractStatefulView {
-  #datepickers = [];
   _state = null;
+
+  #datepickers = [];
   #availableOffers = [];
   #availableDestinations = [];
 
@@ -247,6 +248,26 @@ export default class PointEditView extends AbstractStatefulView {
       .addEventListener('input', this.#destinationHandler);
   };
 
+  #typeHandler = (evt) => {
+    evt.preventDefault();
+    const ntype = evt.target.textContent.toLowerCase();
+    this.updateElement({
+      'type': ntype,
+      'state_offers': getAvailableOffers(ntype, this.#availableOffers),
+    });
+  };
+
+  #destinationHandler = (evt) => {
+    evt.preventDefault();
+    const destination = evt.target.value;
+    if (getListElementsNamesList(this.#availableDestinations).includes(destination)) {
+      const index = getListElementId(destination, this.#availableDestinations);
+      this.updateElement({
+        'destination': index,
+      });
+    }
+  };
+
   #dateFromChangeHandler = ([ndate]) =>{
     this.updateElement({
       'date_from': ndate,
@@ -256,6 +277,28 @@ export default class PointEditView extends AbstractStatefulView {
   #dateToChangeHandler = ([ndate]) =>{
     this.updateElement({
       'date_to': ndate,
+    });
+  };
+
+  #priceHandler = (evt) => {
+    evt.preventDefault();
+    this._setState({
+      'base_price': evt.target.value,
+    });
+  };
+
+  #offersHandler = (evt) => {
+    evt.preventDefault();
+    const clickedOfferId = getIdFromTag(evt.target);
+    const stateOffers = this._state.state_offers;
+    for (const offer of stateOffers) {
+      if (offer.id === clickedOfferId) {
+        offer.isChecked = !offer.isChecked;
+        break;
+      }
+    }
+    this.updateElement({
+      'state_offers': stateOffers,
     });
   };
 
@@ -284,48 +327,6 @@ export default class PointEditView extends AbstractStatefulView {
           'disable': [this.#isBeforeDateFrom],
         },
       )];
-  };
-
-  #offersHandler = (evt) => {
-    evt.preventDefault();
-    const clickedOfferId = getIdFromTag(evt.target);
-    const stateOffers = this._state.state_offers;
-    for (const offer of stateOffers) {
-      if (offer.id === clickedOfferId) {
-        offer.isChecked = !offer.isChecked;
-        break;
-      }
-    }
-    this.updateElement({
-      'state_offers': stateOffers,
-    });
-  };
-
-  #priceHandler = (evt) => {
-    evt.preventDefault();
-    this._setState({
-      'base_price': evt.target.value,
-    });
-  };
-
-  #typeHandler = (evt) => {
-    evt.preventDefault();
-    const ntype = evt.target.textContent.toLowerCase();
-    this.updateElement({
-      'type': ntype,
-      'state_offers': getAvailableOffers(ntype, this.#availableOffers),
-    });
-  };
-
-  #destinationHandler = (evt) => {
-    evt.preventDefault();
-    const destination = evt.target.value;
-    if (getListElementsNamesList(this.#availableDestinations).includes(destination)) {
-      const index = getListElementId(destination, this.#availableDestinations);
-      this.updateElement({
-        'destination': index,
-      });
-    }
   };
 
   setFormSubmitHandler = (callback) => {

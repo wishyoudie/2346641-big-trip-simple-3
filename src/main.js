@@ -1,10 +1,10 @@
-import FilterPresenter from './presenter/filter-presenter.js';
-import ListPresenter from './presenter/list-presenter.js';
 import {render} from './framework/render.js';
+import PointsApiService from './points-api-service.js';
 import PointsModel from './model/point-model.js';
 import FilterModel from './model/filter-model.js';
+import FilterPresenter from './presenter/filter-presenter.js';
+import ListPresenter from './presenter/list-presenter.js';
 import NewPointButtonView from './view/new-point-button-view.js';
-import PointsApiService from './points-api-service.js';
 import { generateAuthorizationKey } from './utils/util.js';
 
 const AUTHORIZATION = `Basic ${generateAuthorizationKey(10)}`;

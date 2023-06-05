@@ -13,6 +13,25 @@ export default class NewPointPresenter {
     this.#changeData = changeData;
   }
 
+  setSaving = () => {
+    this.#pointEditComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  };
+
+  setAborting = () => {
+    const resetFormState = () => {
+      this.#pointEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#pointEditComponent.shake(resetFormState);
+  };
+
   init = (callback, availableOffers, availableDestinations) => {
     this.#destroyCallback = callback;
 
@@ -40,25 +59,6 @@ export default class NewPointPresenter {
     this.#pointEditComponent = null;
 
     document.removeEventListener('keydown', this.#escKeyDownHandler);
-  };
-
-  setSaving = () => {
-    this.#pointEditComponent.updateElement({
-      isDisabled: true,
-      isSaving: true,
-    });
-  };
-
-  setAborting = () => {
-    const resetFormState = () => {
-      this.#pointEditComponent.updateElement({
-        isDisabled: false,
-        isSaving: false,
-        isDeleting: false,
-      });
-    };
-
-    this.#pointEditComponent.shake(resetFormState);
   };
 
   #handleFormSubmit = (point) => {

@@ -4,6 +4,7 @@ import { getFormattedDate, validateNumber, getAvailableOffers } from '../utils/u
 const createPointTemplate = (point, availableOffers, availableDestinations) => {
   availableOffers = getAvailableOffers(point.type, availableOffers);
   const pointIcon = `img/icons/${point.type}.png`;
+
   const getOffersMarkup = () => {
     if (point.offers.length === 0) {
       return `
@@ -56,6 +57,7 @@ const createPointTemplate = (point, availableOffers, availableDestinations) => {
 
 export default class PointItemView extends AbstractView {
   #element = null;
+
   #availableOffers = [];
   #availableDestinations = [];
 

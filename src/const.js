@@ -1,6 +1,7 @@
 import {getFormattedDate} from './utils/util.js';
 
 const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+
 const MODEL_DATE_FORMAT = 'YYYY-MM-DDTHH:mm';
 
 const FilterType = {

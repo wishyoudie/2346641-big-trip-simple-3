@@ -3,6 +3,7 @@ import { UpdateType } from '../const.js';
 
 export default class PointsModel extends Observable {
   #pointsApiService = null;
+
   #points = [];
   #offers = [];
   #destinations = [];
@@ -10,10 +11,6 @@ export default class PointsModel extends Observable {
   constructor (pointsApiService) {
     super();
     this.#pointsApiService = pointsApiService;
-
-    // this.#pointsApiService.points.then((items) => {
-    //   console.log(items[0]);
-    // });
   }
 
   get points() {
