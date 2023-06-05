@@ -44,7 +44,7 @@ export default class ListPresenter {
     if (this.#pointsModel.points.length !== 0) {
       this.#currentSortType = SortType.DAY;
       this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-      this.#newPointPresenter.init(callback);
+      this.#newPointPresenter.init(callback, this.#pointsModel.offers, this.#pointsModel.destinations);
     } else {
       remove(this.#noPointsComponent);
       render(this.#pointListComponent, this.#container);

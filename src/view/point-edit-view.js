@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { POINT_TYPES } from '../const.js';
+import { POINT_TYPES, defaultPoint } from '../const.js';
 import { compareDates,
   getFormattedDate,
   getIdFromTag,
@@ -154,23 +154,13 @@ const createPointEditTemplate = (data, availableDestinations) => {
   </form>`;
 };
 
-const defaultPoint = {
-  'id': 0,
-  'type': 'taxi',
-  'base_price': 0,
-  'date_from': '1970-01-01',
-  'date_to': '1970-01-02',
-  'destination': null,
-  'offers': [],
-};
-
 export default class PointEditView extends AbstractStatefulView {
   #datepickers = [];
   _state = null;
   #availableOffers = [];
   #availableDestinations = [];
 
-  constructor(point = defaultPoint, availableOffers = [], availableDestinations = []) {
+  constructor(point = defaultPoint(), availableOffers = [], availableDestinations = []) {
     super();
     this._state = PointEditView.parsePointToState(point, getAvailableOffers(point.type, availableOffers));
     this.#availableOffers = availableOffers;
