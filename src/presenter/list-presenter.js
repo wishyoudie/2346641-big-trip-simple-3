@@ -3,24 +3,27 @@ import PointListView from '../view/point-list-view.js';
 import SortView from '../view/sort-view.js';
 import EmptyPointListView from '../view/point-list-empty-view.js';
 import PointPresenter from './point-presenter.js';
-import { SortType, UserAction, UpdateType } from '../const.js';
+import { SortType, UserAction, UpdateType, FilterType } from '../const.js';
 import { sortPointsByDay, sortPointsByPrice } from '../utils/sort.js';
+import { filter } from '../utils/filter.js';
 
 export default class ListPresenter {
   #container = null;
   #pointsModel = null;
-
+  #filterModel = null;
   #pointListComponent = new PointListView();
   #sortComponent = null;
-  #noPointsComponent = new EmptyPointListView();
+  #noPointsComponent = null;
   #pointPresenter = new Map();
   #currentSortType = SortType.DAY;
+  #filterType = FilterType.EVERYTHING;
 
-  constructor(container, pointsModel) {
+  constructor(container, filterModel, pointsModel) {
     this.#container = container;
     this.#pointsModel = pointsModel;
-
+    this.#filterModel = filterModel;
     this.#pointsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   init() {
@@ -28,24 +31,33 @@ export default class ListPresenter {
   }
 
   get points() {
+    this.#filterType = this.#filterModel.filter;
+    const points = this.#pointsModel.points;
+    const filteredPoints = filter[this.#filterType](points);
+
     switch (this.#currentSortType) {
       case SortType.DAY:
-        return [...this.#pointsModel.points].sort(sortPointsByDay);
+        return filteredPoints.sort(sortPointsByDay);
       case SortType.PRICE:
-        return [...this.#pointsModel.points].sort(sortPointsByPrice);
+        return filteredPoints.sort(sortPointsByPrice);
     }
-    return this.#pointsModel.points;
+    return filteredPoints;
   }
 
   #renderMain = () => {
     if (this.points.length === 0) {
-      render(this.#noPointsComponent, this.#container);
+      this.#renderIfEmpty();
       return;
     }
 
     this.#renderSort();
     render(this.#pointListComponent, this.#container);
     this.points.forEach((point) => this.#renderListItemComponent(point));
+  };
+
+  #renderIfEmpty = () => {
+    this.#noPointsComponent = new EmptyPointListView(this.#filterType);
+    render(this.#noPointsComponent, this.#container);
   };
 
   #handleModeChange = () => {
@@ -111,7 +123,11 @@ export default class ListPresenter {
     this.#pointPresenter.clear();
 
     remove(this.#sortComponent);
-    remove(this.#noPointsComponent);
+
+    if (this.#noPointsComponent) {
+      remove(this.#noPointsComponent);
+    }
+
     if (resetSortType) {
       this.#currentSortType = SortType.DAY;
     }
