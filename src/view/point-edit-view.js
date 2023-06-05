@@ -321,15 +321,8 @@ export default class PointEditView extends AbstractStatefulView {
   };
 
   static parseStateToPoint = (state) => {
-    // state_offer: {id, title, price, isChecked}
-    // state_offers = [{}, {}, ...]
     const point = {...state};
-    const noffers = [];
-    point.state_offers.map((stoff) => {
-      if (stoff.isChecked) {
-        noffers.push(stoff.id);
-      }
-    });
+    const noffers = point.state_offers.filter((stoff) => stoff.isChecked);
     point.offers = noffers;
     delete point.state_offers;
     return point;

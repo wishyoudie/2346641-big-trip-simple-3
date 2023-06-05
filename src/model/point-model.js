@@ -58,7 +58,7 @@ export default class PointsModel extends Observable {
     }
 
     try {
-      const updatedPoint = await this.#pointsApiService.updateTask(update);
+      const updatedPoint = await this.#pointsApiService.updatePoint(update);
       this.#points = [
         ...this.#points.slice(0, index),
         updatedPoint,
