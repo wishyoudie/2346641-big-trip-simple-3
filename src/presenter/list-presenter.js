@@ -59,6 +59,7 @@ export default class ListPresenter {
 
   init() {
     this.#renderMain();
+    // asjdaksd
   }
 
   #renderMain = () => {
